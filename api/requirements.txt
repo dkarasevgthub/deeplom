@@ -1,0 +1,6 @@
+fastapi
+PyJWT
+bcrypt
+psycopg[binary]
+psycopg_pool
+uvicorn[standard]
