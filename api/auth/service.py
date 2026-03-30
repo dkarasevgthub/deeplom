@@ -13,6 +13,7 @@ def fetch_user_by_login(connection: Connection, login: str):
                 full_name,
                 login,
                 password_hash,
+                role,
                 warehouse_id,
                 is_active,
                 created_at
@@ -33,6 +34,7 @@ def fetch_user_by_id(connection: Connection, user_id: int):
                 full_name,
                 login,
                 password_hash,
+                role,
                 warehouse_id,
                 is_active,
                 created_at
@@ -44,12 +46,33 @@ def fetch_user_by_id(connection: Connection, user_id: int):
         return cursor.fetchone()
 
 
+def fetch_all_users(connection: Connection):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            select
+                id,
+                full_name,
+                login,
+                password_hash,
+                role,
+                warehouse_id,
+                is_active,
+                created_at
+            from app.users
+            order by id
+            """
+        )
+        return cursor.fetchall()
+
+
 def create_user(
     connection: Connection,
     *,
     full_name: str,
     login: str,
     password_hash: str,
+    role: str,
     warehouse_id: int | None,
 ):
     try:
@@ -61,24 +84,69 @@ def create_user(
                         full_name,
                         login,
                         password_hash,
+                        role,
                         warehouse_id,
                         is_active
                     )
-                    values (%s, %s, %s, %s, true)
+                    values (%s, %s, %s, %s, %s, true)
                     returning
                         id,
                         full_name,
                         login,
                         password_hash,
+                        role,
                         warehouse_id,
                         is_active,
                         created_at
                     """,
-                    (full_name, login, password_hash, warehouse_id),
+                    (full_name, login, password_hash, role, warehouse_id),
                 )
                 return cursor.fetchone()
     except UniqueViolation:
         return None
+
+
+def update_user(connection: Connection, user_id: int, updates: dict[str, object]):
+    if not updates:
+        return fetch_user_by_id(connection, user_id)
+
+    set_clauses = [f"{field} = %s" for field in updates]
+    params = [*updates.values(), user_id]
+
+    with connection.transaction():
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"""
+                update app.users
+                set {', '.join(set_clauses)}
+                where id = %s
+                returning
+                    id,
+                    full_name,
+                    login,
+                    password_hash,
+                    role,
+                    warehouse_id,
+                    is_active,
+                    created_at
+                """,
+                params,
+            )
+            return cursor.fetchone()
+
+
+def delete_user(connection: Connection, user_id: int):
+    with connection.transaction():
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                delete from app.users
+                where id = %s
+                returning id
+                """,
+                (user_id,),
+            )
+            return cursor.fetchone()
 
 
 def create_refresh_token_record(

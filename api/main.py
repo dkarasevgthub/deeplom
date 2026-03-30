@@ -17,16 +17,17 @@ async def lifespan(app: FastAPI):
         close_db_pool()
 
 
-app = FastAPI(title="Golangmonster API", lifespan=lifespan)
+app = FastAPI(title="API", lifespan=lifespan)
 
 
 @app.get("/")
 def root():
     return "Hello, World!"
 
-@app.get("/health")
-def root():
+
+@app.get("/api/health")
+def health():
     return {"status": "ok"}
 
 
-app.include_router(auth_router)
+app.include_router(auth_router, prefix="/api")

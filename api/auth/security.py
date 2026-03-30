@@ -46,6 +46,7 @@ def create_access_token(user: dict[str, Any], settings: Settings) -> tuple[str, 
     payload = {
         "sub": str(user["id"]),
         "login": user["login"],
+        "role": user["role"],
         "warehouse_id": user["warehouse_id"],
         "type": "access",
         "exp": datetime.now(UTC) + timedelta(seconds=expires_in),
