@@ -1,2 +1,4 @@
 .env
 out
+.vscode
+__pycache__

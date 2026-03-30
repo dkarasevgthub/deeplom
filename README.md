@@ -1,1 +1,1 @@
-dimpolm
+diplom

@@ -37,3 +37,25 @@ db-port-forward:
 
 db-port-close:
 	docker compose down port-forwarder
+
+api-up:
+	docker compose up -d api
+
+api-down:
+	docker compose down api
+
+app-up:
+	make db-up
+	make api-up
+
+app-down:
+	make db-down
+	make api-down
+
+app-build:
+	docker compose up -d --build api
+	docker compose down api
+
+first-run:
+	make app-build
+	make app-up
