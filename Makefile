@@ -59,3 +59,6 @@ app-build:
 first-run:
 	make app-build
 	make app-up
+
+desktop-run:
+	python desktop/main.py
