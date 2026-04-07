@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from auth.router import router as auth_router
 from config import get_settings
 from db import close_db_pool, initialize_db_pool
+from warehouses.router import router as warehouses_router
 
 
 @asynccontextmanager
@@ -31,3 +32,4 @@ def health():
 
 
 app.include_router(auth_router, prefix="/api")
+app.include_router(warehouses_router, prefix="/api")

@@ -12,21 +12,24 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from desktop.auth.service import AuthService
 from desktop.models import User
 from desktop.ui.pages.catalog_page import CatalogPage
 from desktop.ui.pages.home_page import HomePage
 from desktop.ui.pages.orders_page import OrdersPage
 from desktop.ui.pages.receiving_page import ReceivingPage
 from desktop.ui.pages.shipping_page import ShippingPage
+from desktop.ui.pages.users_page import UsersPage
 from desktop.ui.role_labels import get_role_label
 
 
 class MainWindow(QWidget):
     logout_requested = Signal()
 
-    def __init__(self, user: User):
+    def __init__(self, user: User, auth_service: AuthService):
         super().__init__()
         self.user = user
+        self.auth_service = auth_service
         self._nav_buttons: dict[str, QPushButton] = {}
 
         self.setWindowTitle("ProЗапас")
@@ -52,6 +55,7 @@ class MainWindow(QWidget):
         self.shipping_button = self._build_nav_button("Отгрузка", "shipping")
         self.orders_button = self._build_nav_button("Заказы", "orders")
         self.catalog_button = self._build_nav_button("Справочник", "catalog")
+        self.users_button = self._build_nav_button("Пользователи", "users")
 
         self.user_meta_label = QLabel(f"{self.user.full_name}\n{get_role_label(self.user.role)}")
         self.user_meta_label.setObjectName("userMeta")
@@ -72,6 +76,7 @@ class MainWindow(QWidget):
         sidebar_layout.addWidget(self.shipping_button)
         sidebar_layout.addWidget(self.orders_button)
         sidebar_layout.addWidget(self.catalog_button)
+        sidebar_layout.addWidget(self.users_button)
         sidebar_layout.addStretch()
         sidebar_layout.addWidget(self.user_meta_label)
         sidebar_layout.addSpacing(8)
@@ -89,6 +94,7 @@ class MainWindow(QWidget):
         self.stack.addWidget(ShippingPage(self.user))
         self.stack.addWidget(OrdersPage(self.user))
         self.stack.addWidget(CatalogPage(self.user))
+        self.stack.addWidget(UsersPage(self.user, self.auth_service))
 
         self.page_lookup = {
             "home": 0,
@@ -96,6 +102,7 @@ class MainWindow(QWidget):
             "shipping": 2,
             "orders": 3,
             "catalog": 4,
+            "users": 5,
         }
 
         content_layout = QVBoxLayout()

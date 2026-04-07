@@ -54,6 +54,10 @@ class AuthService:
         finally:
             self.clear_session()
 
+    @property
+    def access_token(self) -> str | None:
+        return self._session.access_token if self._session else None
+
     def clear_session(self) -> None:
         self._session = None
         self.token_storage.clear()

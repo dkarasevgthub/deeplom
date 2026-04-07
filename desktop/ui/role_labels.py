@@ -4,7 +4,7 @@ from __future__ import annotations
 ROLE_LABELS = {
     "admin": "Администратор",
     "manager": "Менеджер",
-    "wirehouse": "Склад",
+    "warehouse": "Складской работник",
 }
 
 

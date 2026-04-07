@@ -115,14 +115,20 @@ def register(
     connection: Connection = Depends(get_db_connection),
 ):
     password_hash = hash_password(payload.password)
-    user = create_user(
-        connection,
-        full_name=payload.full_name,
-        login=payload.login,
-        password_hash=password_hash,
-        role=payload.role,
-        warehouse_id=payload.warehouse_id,
-    )
+    try:
+        user = create_user(
+            connection,
+            full_name=payload.full_name,
+            login=payload.login,
+            password_hash=password_hash,
+            role=payload.role,
+            warehouse_id=payload.warehouse_id,
+        )
+    except ForeignKeyViolation as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Warehouse does not exist",
+        ) from exc
 
     if user is None:
         raise HTTPException(

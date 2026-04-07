@@ -103,7 +103,7 @@ class DesktopApplication:
         if self.main_window is not None:
             self.main_window.close()
 
-        self.main_window = MainWindow(user)
+        self.main_window = MainWindow(user, self.auth_service)
         self.main_window.logout_requested.connect(self.handle_logout)
         self.main_window.showMaximized()
         self.login_window.hide()
